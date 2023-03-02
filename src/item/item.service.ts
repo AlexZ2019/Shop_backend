@@ -12,13 +12,14 @@ class ItemService {
     const pageSizeNumber = Number(pageSize);
     const lastItemCount = Number(page) * pageSizeNumber;
     const skip = lastItemCount - pageSizeNumber;
-    return await this.itemRepository.findAndCount({
-      order: {
-        id: 'DESC',
-      },
+    const [result, total] = await this.itemRepository.findAndCount({
       skip,
       take: pageSizeNumber,
     });
+    return {
+      items: result,
+      total,
+    };
   }
 }
 

@@ -11,8 +11,17 @@ class ItemModel {
   @Field({ nullable: true })
   image: string;
 
-  @Field()
+  @Field({ nullable: true })
   description: string;
 }
 
-export default ItemModel;
+@ObjectType()
+class ItemsModel {
+  @Field()
+  total: string;
+
+  @Field(() => [ItemModel])
+  items: ItemModel[];
+}
+
+export default ItemsModel;
