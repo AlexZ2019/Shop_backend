@@ -21,6 +21,11 @@ class ItemService {
       total,
     };
   }
+
+  public async getItem(id: number) {
+    console.log(id);
+    return await this.itemRepository.findOneBy({ id });
+  }
 }
 
 export default ItemService;

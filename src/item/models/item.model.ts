@@ -15,13 +15,5 @@ class ItemModel {
   description: string;
 }
 
-@ObjectType()
-class ItemsModel {
-  @Field()
-  total: string;
 
-  @Field(() => [ItemModel])
-  items: ItemModel[];
-}
-
-export default ItemsModel;
+export default ItemModel;
