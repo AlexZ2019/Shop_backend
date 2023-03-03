@@ -19,7 +19,7 @@ class ItemResolver {
   ) {}
 
   @Query(() => ItemsModel)
-  // @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard)
   public async getItems(@Args() args: ItemArgs) {
     return this.itemService.getItems(args.page, args.pageSize);
   }
