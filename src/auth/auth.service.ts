@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import constants from './constants/auth.constants';
 import { GraphQLError } from 'graphql/error';
@@ -32,7 +32,16 @@ export default class AuthService {
       }),
     };
   }
-  
+
+  private async saveAndReturnTokens(user) {
+    const tokens = this.generateTokens({
+      id: user.id,
+      email: user.email,
+    });
+    await this.tokenRepository.save({ userId: user.id, ...tokens });
+    return tokens;
+  }
+
   public async login(user: AuthArgs) {
     const existedUser = await this.usersService.getUserByEmailWithPassword(
       user.email,
@@ -42,31 +51,38 @@ export default class AuthService {
         user.password,
         existedUser.password,
       );
-      // TODO: check if comparePassword works ^^
       if (matchedPassword) {
-        const payload = {
-          email: existedUser.email,
-          id: existedUser.id,
-        };
-        const tokens = this.generateTokens(payload);
-        await this.tokenRepository.save({ userId: existedUser.id, ...tokens });
-        return tokens;
+        return this.saveAndReturnTokens(existedUser);
       }
     }
     throw new GraphQLError('Invalid Credentials');
   }
-  
+
   public async refreshTokens(
     user: { id: number; email: string },
     refreshToken: string,
   ) {
-    const newTokens = this.generateTokens(user);
     await this.tokenRepository.delete({ userId: user.id, refreshToken });
-    await this.tokenRepository.save({ userId: user.id, ...newTokens });
-    return newTokens;
+    return this.saveAndReturnTokens(user);
   }
-  
+
   public async logout(id: number, accessToken: string): Promise<void> {
     await this.tokenRepository.delete({ userId: id, accessToken });
+  }
+
+  async googleSignIn(user) {
+    if (!user) {
+      throw new BadRequestException('Unauthenticated');
+    }
+
+    const userExists = await this.usersService.getUserByEmail(user.email);
+    if (!userExists) {
+      const newUser = await this.usersService.createGoogleUser(user);
+      return this.saveAndReturnTokens({
+        id: newUser.raw.id,
+        email: newUser.raw.email,
+      });
+    }
+    return this.saveAndReturnTokens(userExists);
   }
 }

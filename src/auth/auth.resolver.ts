@@ -1,4 +1,4 @@
-import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Injectable, UseGuards } from '@nestjs/common';
 import AuthService from './auth.service';
 import Tokens from './models/tokens.model';
@@ -10,12 +10,12 @@ import AccessTokenGuard from './guards/accessToken.guard';
 @Resolver(() => Tokens)
 export default class AuthResolver {
   constructor(private readonly authService: AuthService) {}
-  
+
   @Mutation(() => Tokens)
   async login(@Args() authArgs: AuthArgs) {
     return this.authService.login(authArgs);
   }
-  
+
   @Mutation(() => Tokens)
   @UseGuards(RefreshTokenGuard)
   public async refreshToken(@Context() context): Promise<Tokens> {
@@ -24,7 +24,7 @@ export default class AuthResolver {
       context.req.headers.authorization.replace('Bearer ', ''),
     );
   }
-  
+
   @Mutation(() => Boolean)
   @UseGuards(AccessTokenGuard)
   public async logout(@Context() context): Promise<void> {
@@ -33,4 +33,5 @@ export default class AuthResolver {
       context.req.headers.authorization.replace('Bearer ', ''),
     );
   }
+
 }

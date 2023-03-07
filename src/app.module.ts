@@ -22,6 +22,5 @@ import ItemModule from './item/item.module';
     CommonModule,
     ItemModule,
   ],
-  providers: [],
 })
 export class AppModule {}

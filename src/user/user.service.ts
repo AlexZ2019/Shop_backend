@@ -15,8 +15,13 @@ class UserService {
 
   async getUserByEmail(email: string) {
     const user = await this.userRepository.findOneBy({ email });
-    const { password, ...restUser } = user;
-    return restUser;
+    if (user) {
+      return {
+        id: user.id,
+        email: user.email,
+      };
+    }
+    return null;
   }
 
   async createUser(user: { email: string; password: string; sex: string }) {
@@ -25,6 +30,10 @@ class UserService {
     });
     if (existedUser) throw new Error('User with this email exists');
     return this.userRepository.insert(user);
+  }
+
+  async createGoogleUser(user) {
+    return this.userRepository.insert({ email: user.email });
   }
 }
 
