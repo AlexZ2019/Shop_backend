@@ -9,8 +9,7 @@ import RefreshTokenStrategy from './strategies/refreshToken.strategy';
 import UserService from '../user/user.service';
 import User from '../user/entity/user.entity';
 import Token from './entities/token.entity';
-import { AuthGoogleController } from './authGoogle.controller';
-import { GoogleStrategy } from "./strategies/google.strategy";
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -27,6 +26,5 @@ import { GoogleStrategy } from "./strategies/google.strategy";
     GoogleStrategy,
   ],
   exports: [AuthService],
-  controllers: [AuthGoogleController],
 })
 export default class AuthModule {}

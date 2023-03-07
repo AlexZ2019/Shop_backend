@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import constants from './constants/auth.constants';
 import { GraphQLError } from 'graphql/error';
@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import comparePassword from './utils/comparePassword';
 import Token from './entities/token.entity';
 import AuthArgs from './dto/inputs.dto';
+import { OAuth2Client } from 'google-auth-library';
 
 @Injectable()
 export default class AuthService {
@@ -70,14 +71,16 @@ export default class AuthService {
     await this.tokenRepository.delete({ userId: id, accessToken });
   }
 
-  async googleSignIn(user) {
-    if (!user) {
-      throw new BadRequestException('Unauthenticated');
-    }
-
-    const userExists = await this.usersService.getUserByEmail(user.email);
+  async googleSignIn(payload) {
+    const client = new OAuth2Client(this.configService.get('GOOGLE_CLIENT_ID'));
+    const parsedToken = await client.verifyIdToken({
+      idToken: payload.token,
+      audience: this.configService.get('GOOGLE_CLIENT_ID'),
+    });
+    const email = parsedToken.getPayload().email;
+    const userExists = await this.usersService.getUserByEmail(email);
     if (!userExists) {
-      const newUser = await this.usersService.createGoogleUser(user);
+      const newUser = await this.usersService.createGoogleUser(email);
       return this.saveAndReturnTokens({
         id: newUser.raw.id,
         email: newUser.raw.email,

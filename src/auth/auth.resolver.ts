@@ -5,6 +5,7 @@ import Tokens from './models/tokens.model';
 import AuthArgs from './dto/inputs.dto';
 import RefreshTokenGuard from './guards/refreshToken.guard';
 import AccessTokenGuard from './guards/accessToken.guard';
+import TokenArgs from './dto/token.dto';
 
 @Injectable()
 @Resolver(() => Tokens)
@@ -14,6 +15,11 @@ export default class AuthResolver {
   @Mutation(() => Tokens)
   async login(@Args() authArgs: AuthArgs) {
     return this.authService.login(authArgs);
+  }
+
+  @Mutation(() => Tokens)
+  async loginWithGoogle(@Args() token: TokenArgs) {
+    return this.authService.googleSignIn(token);
   }
 
   @Mutation(() => Tokens)
@@ -33,5 +39,4 @@ export default class AuthResolver {
       context.req.headers.authorization.replace('Bearer ', ''),
     );
   }
-
 }

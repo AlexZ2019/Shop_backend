@@ -32,8 +32,8 @@ class UserService {
     return this.userRepository.insert(user);
   }
 
-  async createGoogleUser(user) {
-    return this.userRepository.insert({ email: user.email });
+  async createGoogleUser(email) {
+    return this.userRepository.insert({ email });
   }
 }
 
