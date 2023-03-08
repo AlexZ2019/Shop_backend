@@ -7,6 +7,8 @@ import { CommonModule } from './common/common.module';
 import AuthModule from './auth/auth.module';
 import DbModule from './db/db.module';
 import ItemModule from './item/item.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import ItemModule from './item/item.module';
       autoSchemaFile: true,
       sortSchema: true,
     }),
+    ScheduleModule.forRoot(),
+    MailerModule,
     AuthModule,
     DbModule,
     UserModule,
